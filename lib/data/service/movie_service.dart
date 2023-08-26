@@ -12,10 +12,7 @@ abstract class MovieService {
 
   @GET('discover/movie')
   Future<MovieListDto> getMovies({
-    @Query('page') int? page,
-    @Query('include_adult') bool? includeAdult,
-    @Query('include_video') bool? includeVideo,
-    @Query('sort_by') String? sortBy,
+    @Queries() Map<String, dynamic> queries,
   });
 
   @GET('movie/upcoming')
