@@ -19,20 +19,11 @@ class _MovieService implements MovieService {
   String? baseUrl;
 
   @override
-  Future<MovieListDto> getMovies({
-    int? page,
-    bool? includeAdult,
-    bool? includeVideo,
-    String? sortBy,
-  }) async {
+  Future<MovieListDto> getMovies(
+      {required Map<String, dynamic> queries}) async {
     const _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{
-      r'page': page,
-      r'include_adult': includeAdult,
-      r'include_video': includeVideo,
-      r'sort_by': sortBy,
-    };
-    queryParameters.removeWhere((k, v) => v == null);
+    final queryParameters = <String, dynamic>{};
+    queryParameters.addAll(queries);
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
     final _result = await _dio
