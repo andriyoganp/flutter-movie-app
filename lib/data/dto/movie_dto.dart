@@ -42,7 +42,7 @@ class MovieDto {
   final String? originalTitle;
   final String? overview;
   final double? popularity;
-  @JsonKey(name: 'popular_path')
+  @JsonKey(name: 'poster_path')
   final String? posterPath;
   @JsonKey(name: 'release_date')
   final String? releaseDate;
