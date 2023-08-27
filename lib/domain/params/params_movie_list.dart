@@ -1,8 +1,13 @@
+enum MovieContentType { nowPlaying, popular, upcoming }
+
 class ParamsMovieList {
-  ParamsMovieList({this.page = 1, this.isUpcoming = false});
+  ParamsMovieList({
+    this.page = 1,
+    this.contentType = MovieContentType.nowPlaying,
+  });
 
   final int page;
-  final bool isUpcoming;
+  final MovieContentType contentType;
 
   Map<String, dynamic> get queries => <String, dynamic>{
         'page': page,

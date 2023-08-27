@@ -15,6 +15,9 @@ abstract class MovieRepository {
   Future<Either<Failure, List<Movie>>> getUpcomingMovies(
       ParamsMovieList params);
 
+  Future<Either<Failure, List<Movie>>> getNowPlayingMovies(
+      ParamsMovieList params);
+
   Future<Either<Failure, Movie>> getMovieDetail(ParamsMovieDetail params);
 }
 
@@ -29,6 +32,20 @@ class MovieRepositoryImpl extends MovieRepository {
       final MovieListDto result = await _service.getMovies(
         queries: params.queries,
       );
+      final List<Movie> movies = result.results.orEmpty
+          .map((MovieDto movieDto) => movieDto.asModel)
+          .toList();
+      return Right<Failure, List<Movie>>(movies);
+    } catch (e) {
+      return Left<Failure, List<Movie>>(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Movie>>> getNowPlayingMovies(ParamsMovieList params) async {
+    try {
+      final MovieListDto result =
+          await _service.getNowPlayingMovies(page: params.page);
       final List<Movie> movies = result.results.orEmpty
           .map((MovieDto movieDto) => movieDto.asModel)
           .toList();

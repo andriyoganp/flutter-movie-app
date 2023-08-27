@@ -13,8 +13,13 @@ class GetMovieListUseCase extends UseCase<List<Movie>, ParamsMovieList> {
 
   @override
   Future<Either<Failure, List<Movie>>> call(ParamsMovieList params) {
-    return params.isUpcoming
-        ? _repository.getMovies(params)
-        : _repository.getUpcomingMovies(params);
+    switch (params.contentType) {
+      case MovieContentType.nowPlaying:
+        return _repository.getNowPlayingMovies(params);
+      case MovieContentType.upcoming:
+        return _repository.getUpcomingMovies(params);
+      case MovieContentType.popular:
+        return _repository.getMovies(params);
+    }
   }
 }
