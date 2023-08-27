@@ -27,6 +27,6 @@ abstract class MovieService {
 
   @GET('movie/{id}')
   Future<MovieDto> getMovieDetail({
-    @Query('id') int? id,
+    @Path('id') int? id,
   });
 }

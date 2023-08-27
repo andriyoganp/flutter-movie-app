@@ -106,7 +106,7 @@ class _MovieService implements MovieService {
   @override
   Future<MovieDto> getMovieDetail({int? id}) async {
     const _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'id': id};
+    final queryParameters = <String, dynamic>{};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
@@ -118,7 +118,7 @@ class _MovieService implements MovieService {
     )
             .compose(
               _dio.options,
-              'movie/{id}',
+              'movie/${id}',
               queryParameters: queryParameters,
               data: _data,
             )
