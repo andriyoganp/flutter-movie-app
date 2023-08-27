@@ -19,11 +19,11 @@ class _MovieService implements MovieService {
   String? baseUrl;
 
   @override
-  Future<MovieListDto> getMovies(
-      {required Map<String, dynamic> queries}) async {
+  Future<MovieListDto> getMovies({Map<String, dynamic>? queries}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
-    queryParameters.addAll(queries);
+    queryParameters.addAll(queries ?? <String, dynamic>{});
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
     final _result = await _dio
@@ -35,6 +35,34 @@ class _MovieService implements MovieService {
             .compose(
               _dio.options,
               'discover/movie',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = MovieListDto.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<MovieListDto> getNowPlayingMovies({int? page}) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'page': page};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
+    final _result = await _dio
+        .fetch<Map<String, dynamic>>(_setStreamType<MovieListDto>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              'movie/now_playing',
               queryParameters: queryParameters,
               data: _data,
             )

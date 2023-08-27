@@ -12,7 +12,12 @@ abstract class MovieService {
 
   @GET('discover/movie')
   Future<MovieListDto> getMovies({
-    @Queries() Map<String, dynamic> queries,
+    @Queries() Map<String, dynamic>? queries,
+  });
+
+  @GET('movie/now_playing')
+  Future<MovieListDto> getNowPlayingMovies({
+    @Query('page') int? page,
   });
 
   @GET('movie/upcoming')
