@@ -4,11 +4,13 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/extension/string_ext.dart';
-import '../../ui/resource/fonts.dart';
+import '../../domain/model/movie.dart';
 import '../../ui/resource/images.dart';
 import '../../ui/resource/ui_colors.dart';
+import '../component/section_text.dart';
 import '../cubit/movie_list_cubit.dart';
 import '../state/movie_list_state.dart';
+import 'movie_detail_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -58,10 +60,13 @@ class _HomePageState extends State<HomePage> {
                       child: PageView(
                         children: List<Widget>.generate(
                             state.nowPlayingMovies.length, (int index) {
-                          return CachedNetworkImage(
-                            imageUrl: state.nowPlayingMovies[index].posterPath
-                                .imageMovieUrl,
-                            fit: BoxFit.fitWidth,
+                          final Movie movie = state.nowPlayingMovies[index];
+                          return GestureDetector(
+                            onTap: () => _navigateToMovieDetail(movie.id),
+                            child: CachedNetworkImage(
+                              imageUrl: movie.posterPath.imageMovieUrl,
+                              fit: BoxFit.fitWidth,
+                            ),
                           );
                         }),
                       ),
@@ -71,19 +76,13 @@ class _HomePageState extends State<HomePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(
+                        const Padding(
+                          padding: EdgeInsets.only(
                             left: 20,
                             right: 20,
                             top: 20,
                           ),
-                          child: Text(
-                            'Popular Movies',
-                            style: TextStyle(
-                                color: UiColors.white,
-                                fontSize: 16,
-                                fontWeight: Fonts.sfProTextBold),
-                          ),
+                          child: SectionText('Popular Movies')
                         ),
                         Container(
                           padding: const EdgeInsets.only(top: 16),
@@ -95,9 +94,12 @@ class _HomePageState extends State<HomePage> {
                               horizontal: 20,
                             ),
                             itemBuilder: (_, int index) {
-                              return CachedNetworkImage(
-                                imageUrl: state.popularMovies[index].posterPath
-                                    .imageMovieUrl,
+                              final Movie movie = state.popularMovies[index];
+                              return GestureDetector(
+                                onTap: () => _navigateToMovieDetail(movie.id),
+                                child: CachedNetworkImage(
+                                  imageUrl: movie.posterPath.imageMovieUrl,
+                                ),
                               );
                             },
                             separatorBuilder: (_, int index) {
@@ -112,19 +114,14 @@ class _HomePageState extends State<HomePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(
+                        const Padding(
+                          padding: EdgeInsets.only(
                             left: 20,
                             right: 20,
                             top: 20,
                           ),
-                          child: Text(
+                          child: SectionText(
                             'Coming Soon',
-                            style: TextStyle(
-                              color: UiColors.white,
-                              fontSize: 16,
-                              fontWeight: Fonts.sfProTextBold,
-                            ),
                           ),
                         ),
                         Container(
@@ -137,9 +134,12 @@ class _HomePageState extends State<HomePage> {
                               horizontal: 20,
                             ),
                             itemBuilder: (_, int index) {
-                              return CachedNetworkImage(
-                                imageUrl: state.upcomingMovies[index].posterPath
-                                    .imageMovieUrl,
+                              final Movie movie = state.upcomingMovies[index];
+                              return GestureDetector(
+                                onTap: () => _navigateToMovieDetail(movie.id),
+                                child: CachedNetworkImage(
+                                  imageUrl: movie.posterPath.imageMovieUrl,
+                                ),
                               );
                             },
                             separatorBuilder: (_, int index) {
@@ -157,5 +157,10 @@ class _HomePageState extends State<HomePage> {
         )
       ],
     );
+  }
+
+  void _navigateToMovieDetail(int movieId) {
+    debugPrint("NAVIGATE TO DETAIL");
+    Navigator.pushNamed(context, MovieDetailPage.routeName, arguments: movieId);
   }
 }
