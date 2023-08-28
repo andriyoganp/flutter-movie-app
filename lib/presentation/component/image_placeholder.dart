@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../../ui/resource/ui_colors.dart';
 
 class ImagePlaceholder extends StatelessWidget {
-  const ImagePlaceholder({super.key});
+  const ImagePlaceholder({super.key, this.radius = 0});
+
+  final double radius;
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +15,7 @@ class ImagePlaceholder extends StatelessWidget {
           color: UiColors.white.withOpacity(0.7),
           width: 0.5,
         ),
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(radius),
       ),
       child: Icon(Icons.image_outlined, color: UiColors.primary),
     );
