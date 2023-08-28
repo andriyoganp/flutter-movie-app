@@ -10,6 +10,8 @@ import 'popular_page.dart';
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
+  static const String routeName = 'main-page';
+
   @override
   State<MainPage> createState() => _MainPageState();
 }

@@ -5,6 +5,7 @@ import 'di/injection.dart';
 import 'domain/use_case/get_movie_list_use_case.dart';
 import 'presentation/cubit/movie_list_cubit.dart';
 import 'presentation/page/main_page.dart';
+import 'router/router_list.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -15,6 +16,8 @@ class MyApp extends StatelessWidget {
     return BlocProvider<MovieListCubit>(
       create: (_) => MovieListCubit(getIt<GetMovieListUseCase>()),
       child: MaterialApp(
+        routes: RouterList.list,
+        initialRoute: RouterList.initialRoute,
         title: 'Flutter Demo',
         theme: ThemeData(
           // This is the theme of your application.
