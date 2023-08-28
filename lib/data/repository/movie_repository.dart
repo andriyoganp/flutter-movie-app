@@ -1,15 +1,21 @@
+import 'dart:convert';
+
 import 'package:dartz/dartz.dart';
 
 import '../../core/extension/iterable_ext.dart';
+import '../../core/extension/string_ext.dart';
 import '../../core/model/failure.dart';
 import '../../domain/model/cast.dart';
 import '../../domain/model/movie.dart';
+import '../../domain/params/params_favorite_movie.dart';
 import '../../domain/params/params_movie_detail.dart';
 import '../../domain/params/params_movie_list.dart';
+import '../database/movie_dao.dart';
 import '../dto/cast_dto.dart';
 import '../dto/cast_list_dto.dart';
 import '../dto/movie_dto.dart';
 import '../dto/movie_list_dto.dart';
+import '../entity/favorite_movie_entity.dart';
 import '../service/movie_service.dart';
 
 abstract class MovieRepository {
@@ -24,12 +30,21 @@ abstract class MovieRepository {
   Future<Either<Failure, Movie>> getMovieDetail(ParamsMovieDetail params);
 
   Future<Either<Failure, List<Cast>>> getCastMovie(ParamsMovieDetail params);
+
+  Future<Either<Failure, bool>> addToFavorite(ParamsFavoriteMovie params);
+
+  Future<Either<Failure, bool>> deleteFromFavorite(ParamsMovieDetail params);
+
+  Stream<bool> checkIsFavorite(ParamsMovieDetail params);
+
+  Stream<List<Movie>> getFavoriteMovies();
 }
 
 class MovieRepositoryImpl extends MovieRepository {
-  MovieRepositoryImpl(this._service);
+  MovieRepositoryImpl(this._service, this._favoriteMovieDao);
 
   final MovieService _service;
+  final FavoriteMovieDao _favoriteMovieDao;
 
   @override
   Future<Either<Failure, List<Movie>>> getMovies(ParamsMovieList params) async {
@@ -100,5 +115,43 @@ class MovieRepositoryImpl extends MovieRepository {
     } catch (e) {
       return Left<Failure, List<Cast>>(ServerFailure(message: e.toString()));
     }
+  }
+
+  @override
+  Future<Either<Failure, bool>> addToFavorite(
+      ParamsFavoriteMovie params) async {
+    try {
+      final int result = _favoriteMovieDao.addToFavorite(FavoriteMovieEntity(
+          movieId: params.movie.id, movieJsonStr: jsonEncode(params.movie)));
+      return Right<Failure, bool>(result == 0);
+    } catch (e) {
+      return Left<Failure, bool>(CacheFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> deleteFromFavorite(
+      ParamsMovieDetail params) async {
+    try {
+      final bool result = _favoriteMovieDao.deleteFromFavorite(params.id);
+      return Right<Failure, bool>(result);
+    } catch (e) {
+      return Left<Failure, bool>(CacheFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Stream<bool> checkIsFavorite(ParamsMovieDetail params) =>
+      _favoriteMovieDao.isFavorite(params.id);
+
+  @override
+  Stream<List<Movie>> getFavoriteMovies() {
+    return _favoriteMovieDao
+        .getAllFavoriteMovies()
+        .map((List<FavoriteMovieEntity> list) => list
+            .map((FavoriteMovieEntity entity) => Movie.fromJson(
+                  jsonDecode(entity.movieJsonStr.orEmpty),
+                ))
+            .toList());
   }
 }
