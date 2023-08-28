@@ -2,9 +2,12 @@ import 'package:dartz/dartz.dart';
 
 import '../../core/extension/iterable_ext.dart';
 import '../../core/model/failure.dart';
+import '../../domain/model/cast.dart';
 import '../../domain/model/movie.dart';
 import '../../domain/params/params_movie_detail.dart';
 import '../../domain/params/params_movie_list.dart';
+import '../dto/cast_dto.dart';
+import '../dto/cast_list_dto.dart';
 import '../dto/movie_dto.dart';
 import '../dto/movie_list_dto.dart';
 import '../service/movie_service.dart';
@@ -19,6 +22,8 @@ abstract class MovieRepository {
       ParamsMovieList params);
 
   Future<Either<Failure, Movie>> getMovieDetail(ParamsMovieDetail params);
+
+  Future<Either<Failure, List<Cast>>> getCastMovie(ParamsMovieDetail params);
 }
 
 class MovieRepositoryImpl extends MovieRepository {
@@ -42,7 +47,8 @@ class MovieRepositoryImpl extends MovieRepository {
   }
 
   @override
-  Future<Either<Failure, List<Movie>>> getNowPlayingMovies(ParamsMovieList params) async {
+  Future<Either<Failure, List<Movie>>> getNowPlayingMovies(
+      ParamsMovieList params) async {
     try {
       final MovieListDto result =
           await _service.getNowPlayingMovies(page: params.page);
@@ -79,6 +85,20 @@ class MovieRepositoryImpl extends MovieRepository {
       return Right<Failure, Movie>(movie);
     } catch (e) {
       return Left<Failure, Movie>(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Cast>>> getCastMovie(
+      ParamsMovieDetail params) async {
+    try {
+      final CastListDto result = await _service.getMovieCredits(params.id);
+      final List<Cast> casts = result.cast.orEmpty
+          .map((CastDto castDto) => castDto.asModel)
+          .toList();
+      return Right<Failure, List<Cast>>(casts);
+    } catch (e) {
+      return Left<Failure, List<Cast>>(ServerFailure(message: e.toString()));
     }
   }
 }

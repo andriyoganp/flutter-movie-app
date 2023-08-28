@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
+import '../dto/cast_list_dto.dart';
 import '../dto/movie_dto.dart';
 import '../dto/movie_list_dto.dart';
 
@@ -29,4 +30,7 @@ abstract class MovieService {
   Future<MovieDto> getMovieDetail({
     @Path('id') int? id,
   });
+
+  @GET('movie/{id}/credits')
+  Future<CastListDto> getMovieCredits(@Path('id') int id);
 }
