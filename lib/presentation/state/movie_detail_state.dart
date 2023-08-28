@@ -33,12 +33,15 @@ class MovieDetailState extends Equatable {
     this.castStateStatus = CastStateStatus.initial,
     Movie? movie,
     List<Cast>? casts,
+    this.isFavorite = false,
   })  : movie = movie ??
             Movie(
               id: 0,
+              backdropPath: '',
               genreNames: <String>[],
               overview: '',
               posterPath: '',
+              releaseDate: '',
               runtime: 0,
               title: '',
             ),
@@ -48,21 +51,30 @@ class MovieDetailState extends Equatable {
   final Movie movie;
   final CastStateStatus castStateStatus;
   final List<Cast> casts;
+  final bool isFavorite;
 
   MovieDetailState copyWith({
     MovieDetailStateStatus? status,
     Movie? movie,
     CastStateStatus? castStateStatus,
     List<Cast>? casts,
+    bool? isFavorite,
   }) {
     return MovieDetailState(
       status: status ?? this.status,
       movie: movie ?? this.movie,
       castStateStatus: castStateStatus ?? this.castStateStatus,
       casts: casts ?? this.casts,
+      isFavorite: isFavorite ?? this.isFavorite,
     );
   }
 
   @override
-  List<Object?> get props => <Object>[status, movie, castStateStatus, casts];
+  List<Object?> get props => <Object>[
+        status,
+        movie,
+        castStateStatus,
+        casts,
+        isFavorite,
+      ];
 }
