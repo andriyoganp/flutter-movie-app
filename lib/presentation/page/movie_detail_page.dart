@@ -11,6 +11,7 @@ import '../../domain/use_case/get_cast_list_use_case.dart';
 import '../../domain/use_case/get_movie_detail_use_case.dart';
 import '../../ui/resource/fonts.dart';
 import '../../ui/resource/ui_colors.dart';
+import '../component/image_placeholder.dart';
 import '../component/section_text.dart';
 import '../cubit/movie_detail_cubit.dart';
 import '../state/movie_detail_state.dart';
@@ -292,17 +293,8 @@ class _CastItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(50),
             child: CachedNetworkImage(
               imageUrl: cast.profilePath.imageMovieUrl,
-              placeholder: (_, String url) {
-                return Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: UiColors.white.withOpacity(0.7),
-                      width: 0.5,
-                    ),
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: Icon(Icons.image_outlined, color: UiColors.primary),
-                );
+              placeholder: (_, __) {
+                return const ImagePlaceholder();
               },
               fit: BoxFit.fitWidth,
               height: 90,
