@@ -7,6 +7,7 @@ import '../../core/extension/string_ext.dart';
 import '../../domain/model/movie.dart';
 import '../../ui/resource/images.dart';
 import '../../ui/resource/ui_colors.dart';
+import '../component/image_placeholder.dart';
 import '../component/section_text.dart';
 import '../cubit/movie_list_cubit.dart';
 import '../state/movie_list_state.dart';
@@ -61,13 +62,7 @@ class _HomePageState extends State<HomePage> {
                         children: List<Widget>.generate(
                             state.nowPlayingMovies.length, (int index) {
                           final Movie movie = state.nowPlayingMovies[index];
-                          return GestureDetector(
-                            onTap: () => _navigateToMovieDetail(movie.id),
-                            child: CachedNetworkImage(
-                              imageUrl: movie.posterPath.imageMovieUrl,
-                              fit: BoxFit.fitWidth,
-                            ),
-                          );
+                          return _MovieItem(movie, fit: BoxFit.fitWidth);
                         }),
                       ),
                     ),
@@ -77,13 +72,12 @@ class _HomePageState extends State<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         const Padding(
-                          padding: EdgeInsets.only(
-                            left: 20,
-                            right: 20,
-                            top: 20,
-                          ),
-                          child: SectionText('Popular Movies')
-                        ),
+                            padding: EdgeInsets.only(
+                              left: 20,
+                              right: 20,
+                              top: 20,
+                            ),
+                            child: SectionText('Popular Movies')),
                         Container(
                           padding: const EdgeInsets.only(top: 16),
                           height: 150,
@@ -95,12 +89,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             itemBuilder: (_, int index) {
                               final Movie movie = state.popularMovies[index];
-                              return GestureDetector(
-                                onTap: () => _navigateToMovieDetail(movie.id),
-                                child: CachedNetworkImage(
-                                  imageUrl: movie.posterPath.imageMovieUrl,
-                                ),
-                              );
+                              return _MovieItem(movie);
                             },
                             separatorBuilder: (_, int index) {
                               return const SizedBox(width: 8);
@@ -135,12 +124,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             itemBuilder: (_, int index) {
                               final Movie movie = state.upcomingMovies[index];
-                              return GestureDetector(
-                                onTap: () => _navigateToMovieDetail(movie.id),
-                                child: CachedNetworkImage(
-                                  imageUrl: movie.posterPath.imageMovieUrl,
-                                ),
-                              );
+                              return _MovieItem(movie);
                             },
                             separatorBuilder: (_, int index) {
                               return const SizedBox(width: 8);
@@ -158,9 +142,29 @@ class _HomePageState extends State<HomePage> {
       ],
     );
   }
+}
 
-  void _navigateToMovieDetail(int movieId) {
-    debugPrint("NAVIGATE TO DETAIL");
+class _MovieItem extends StatelessWidget {
+  const _MovieItem(this.movie, {this.fit});
+
+  final Movie movie;
+  final BoxFit? fit;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _navigateToMovieDetail(context, movie.id),
+      child: CachedNetworkImage(
+        imageUrl: movie.posterPath.imageMovieUrl,
+        fit: fit,
+        placeholder: (_, __) {
+          return const ImagePlaceholder();
+        },
+      ),
+    );
+  }
+
+  void _navigateToMovieDetail(BuildContext context, int movieId) {
     Navigator.pushNamed(context, MovieDetailPage.routeName, arguments: movieId);
   }
 }
