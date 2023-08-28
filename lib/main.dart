@@ -7,6 +7,6 @@ import 'moviedb_app.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
-  initInjection();
+  await initInjection();
   runApp(const MyApp());
 }
