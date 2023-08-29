@@ -4,6 +4,6 @@ import '../data/repository/movie_repository.dart';
 
 void initRepository(GetIt getIt) {
   getIt.registerLazySingleton<MovieRepository>(
-    () => MovieRepositoryImpl(getIt(), getIt()),
+    () => MovieRepositoryImpl(getIt(), getIt(), getIt()),
   );
 }
