@@ -25,8 +25,6 @@ class _MapPageContent extends StatefulWidget {
 
 class _MapPageContentState extends State<_MapPageContent> {
   Position? _currentPosition;
-  final double _initLatitude = -6.2334;
-  final double _initLongitude = 106.8812;
 
   @override
   void initState() {
@@ -40,61 +38,88 @@ class _MapPageContentState extends State<_MapPageContent> {
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
-        FlutterMap(
-          options: MapOptions(
-            center: LatLng(
-              _currentPosition?.latitude ?? _initLatitude,
-              _currentPosition?.longitude ?? _initLongitude,
-            ),
-          ),
-          children: <Widget>[
-            TileLayer(
-              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-              userAgentPackageName: 'com.moviedb.app',
-            ),
-          ],
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-          child: IntrinsicHeight(
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-              decoration: BoxDecoration(
-                color: UiColors.warning,
-                borderRadius: BorderRadius.circular(20),
+        if (_currentPosition != null &&
+            _currentPosition?.latitude != 0 &&
+            _currentPosition?.longitude != 0)
+          FlutterMap(
+            options: MapOptions(
+              center: LatLng(
+                _currentPosition!.latitude,
+                _currentPosition!.longitude,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  const Text(
-                    'Your current location',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: Fonts.sfProTextBold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Latitude : ${_currentPosition?.latitude}',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: Fonts.sfProTextRegular,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Longitude : ${_currentPosition?.longitude}',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: Fonts.sfProTextRegular,
+            ),
+            children: <Widget>[
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.moviedb.app',
+              ),
+              MarkerLayer(
+                markers: <Marker>[
+                  Marker(
+                    point: LatLng(_currentPosition!.latitude,
+                        _currentPosition!.longitude),
+                    width: 120,
+                    height: 120,
+                    builder: (_) => const Icon(
+                      Icons.location_on,
+                      color: Colors.red,
                     ),
                   ),
                 ],
               ),
+            ],
+          )
+        else
+          const Center(
+            child: RepaintBoundary(
+              child: CircularProgressIndicator(),
             ),
           ),
-        ),
+        if (_currentPosition != null &&
+            _currentPosition?.latitude != 0 &&
+            _currentPosition?.longitude != 0)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            child: IntrinsicHeight(
+              child: Container(
+                width: double.infinity,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                decoration: BoxDecoration(
+                  color: UiColors.warning,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    const Text(
+                      'Your current location',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: Fonts.sfProTextBold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Latitude : ${_currentPosition?.latitude ?? ''}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: Fonts.sfProTextRegular,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Longitude : ${_currentPosition?.longitude ?? ''}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: Fonts.sfProTextRegular,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }
