@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -8,6 +10,7 @@ import '../../domain/model/movie.dart';
 import '../../ui/resource/images.dart';
 import '../../ui/resource/ui_colors.dart';
 import '../component/section_text.dart';
+import '../component/text_placeholder.dart';
 import '../cubit/movie_list_cubit.dart';
 import '../state/movie_list_state.dart';
 import 'movie_detail_page.dart';
@@ -20,6 +23,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool _isShowSnackBar = false;
+
   @override
   void initState() {
     super.initState();
@@ -47,7 +52,13 @@ class _HomePageState extends State<HomePage> {
         ),
         Expanded(
           child: BlocConsumer<MovieListCubit, MovieListState>(
-            listener: (BuildContext context, MovieListState state) {},
+            listener: (BuildContext context, MovieListState state) {
+              if (!_isShowSnackBar) {
+                if (state.nowPlayingStateStatus.isFailure) {
+                  _showSnackBar(state.nowPlayingFailure?.message ?? '');
+                }
+              }
+            },
             builder: (BuildContext context, MovieListState state) {
               return RefreshIndicator(
                 onRefresh: _onRefresh,
@@ -56,13 +67,19 @@ class _HomePageState extends State<HomePage> {
                     SliverToBoxAdapter(
                       child: SizedBox(
                         height: 260,
-                        child: PageView(
-                          children: List<Widget>.generate(
-                              state.nowPlayingMovies.length, (int index) {
-                            final Movie movie = state.nowPlayingMovies[index];
-                            return _MovieItem(movie, fit: BoxFit.fitWidth);
-                          }),
-                        ),
+                        child: state.nowPlayingMovies.isNotEmpty
+                            ? PageView(
+                                children: List<Widget>.generate(
+                                    state.nowPlayingMovies.length, (int index) {
+                                  final Movie movie =
+                                      state.nowPlayingMovies[index];
+                                  return _MovieItem(movie,
+                                      fit: BoxFit.fitWidth);
+                                }),
+                              )
+                            : state.nowPlayingStateStatus.isFailure
+                                ? const TextPlaceholder()
+                                : const SizedBox.shrink(),
                       ),
                     ),
                     SliverToBoxAdapter(
@@ -70,29 +87,35 @@ class _HomePageState extends State<HomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           const Padding(
-                              padding: EdgeInsets.only(
-                                left: 20,
-                                right: 20,
-                                top: 20,
-                              ),
-                              child: SectionText('Popular Movies')),
+                            padding: EdgeInsets.only(
+                              left: 20,
+                              right: 20,
+                              top: 20,
+                            ),
+                            child: SectionText('Popular Movies'),
+                          ),
                           Container(
                             padding: const EdgeInsets.only(top: 16),
                             height: 150,
-                            child: ListView.separated(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: state.popularMovies.length,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                              ),
-                              itemBuilder: (_, int index) {
-                                final Movie movie = state.popularMovies[index];
-                                return _MovieItem(movie);
-                              },
-                              separatorBuilder: (_, int index) {
-                                return const SizedBox(width: 8);
-                              },
-                            ),
+                            child: state.popularMovies.isNotEmpty
+                                ? ListView.separated(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: state.popularMovies.length,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                    ),
+                                    itemBuilder: (_, int index) {
+                                      final Movie movie =
+                                          state.popularMovies[index];
+                                      return _MovieItem(movie);
+                                    },
+                                    separatorBuilder: (_, int index) {
+                                      return const SizedBox(width: 8);
+                                    },
+                                  )
+                                : state.popularStateStatus.isFailure
+                                    ? const TextPlaceholder()
+                                    : const SizedBox.shrink(),
                           )
                         ],
                       ),
@@ -114,20 +137,25 @@ class _HomePageState extends State<HomePage> {
                           Container(
                             padding: const EdgeInsets.only(top: 16),
                             height: 150,
-                            child: ListView.separated(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: state.upcomingMovies.length,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                              ),
-                              itemBuilder: (_, int index) {
-                                final Movie movie = state.upcomingMovies[index];
-                                return _MovieItem(movie);
-                              },
-                              separatorBuilder: (_, int index) {
-                                return const SizedBox(width: 8);
-                              },
-                            ),
+                            child: state.upcomingMovies.isNotEmpty
+                                ? ListView.separated(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: state.upcomingMovies.length,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                    ),
+                                    itemBuilder: (_, int index) {
+                                      final Movie movie =
+                                          state.upcomingMovies[index];
+                                      return _MovieItem(movie);
+                                    },
+                                    separatorBuilder: (_, int index) {
+                                      return const SizedBox(width: 8);
+                                    },
+                                  )
+                                : state.upcomingStateStatus.isFailure
+                                    ? const TextPlaceholder()
+                                    : const SizedBox.shrink(),
                           )
                         ],
                       ),
@@ -147,6 +175,24 @@ class _HomePageState extends State<HomePage> {
       ..fetchNowPlayingMovies()
       ..fetchPopularMovies()
       ..fetchUpcomingMovies();
+  }
+
+  void _showSnackBar(String message) {
+    _isShowSnackBar = true;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(
+          SnackBar(
+            content: Text(
+              message,
+            ),
+          ),
+        )
+        .closed
+        .then((_) {
+      setState(() {
+        _isShowSnackBar = false;
+      });
+    });
   }
 }
 

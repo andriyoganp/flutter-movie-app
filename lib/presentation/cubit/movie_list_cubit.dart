@@ -21,7 +21,14 @@ class MovieListCubit extends Cubit<MovieListState> {
     try {
       final Either<Failure, List<Movie>> result =
           await _getMovieListUseCase.call(ParamsMovieList());
-      result.fold(setFailure, (List<Movie> list) {
+      result.fold((Failure failure) {
+        emit(
+          state.copyWith(
+            nowPlayingStateStatus: MovieListStateStatus.failure,
+            nowPlayingFailure: failure,
+          ),
+        );
+      }, (List<Movie> list) {
         emit(
           state.copyWith(
             nowPlayingStateStatus: MovieListStateStatus.success,
@@ -43,7 +50,14 @@ class MovieListCubit extends Cubit<MovieListState> {
     try {
       final Either<Failure, List<Movie>> result = await _getMovieListUseCase
           .call(ParamsMovieList(contentType: MovieContentType.popular));
-      result.fold(setFailure, (List<Movie> list) {
+      result.fold((Failure failure) {
+        emit(
+          state.copyWith(
+            popularStateStatus: MovieListStateStatus.failure,
+            popularFailure: failure,
+          ),
+        );
+      }, (List<Movie> list) {
         emit(
           state.copyWith(
             popularStateStatus: MovieListStateStatus.success,
@@ -66,7 +80,14 @@ class MovieListCubit extends Cubit<MovieListState> {
     try {
       final Either<Failure, List<Movie>> result = await _getMovieListUseCase
           .call(ParamsMovieList(contentType: MovieContentType.upcoming));
-      result.fold(setFailure, (List<Movie> list) {
+      result.fold((Failure failure) {
+        emit(
+          state.copyWith(
+            upcomingStateStatus: MovieListStateStatus.failure,
+            upcomingFailure: failure,
+          ),
+        );
+      }, (List<Movie> list) {
         emit(
           state.copyWith(
             upcomingStateStatus: MovieListStateStatus.success,
@@ -77,10 +98,6 @@ class MovieListCubit extends Cubit<MovieListState> {
     } catch (e) {
       emit(state.copyWith(upcomingStateStatus: MovieListStateStatus.failure));
     }
-  }
-
-  void setFailure(Failure l) {
-    emit(state.copyWith(popularStateStatus: MovieListStateStatus.failure));
   }
 
   void searchPopularMovies(String query) {

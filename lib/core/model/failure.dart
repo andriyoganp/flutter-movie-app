@@ -20,12 +20,12 @@ class CacheFailure extends Failure {
   const CacheFailure({super.message});
 
   @override
-  List<Object?> get props => <Object>[];
+  List<Object?> get props => <Object>[message];
 }
 
 class ConnectionFailure extends Failure {
-  const ConnectionFailure({super.message});
+  const ConnectionFailure({super.message = 'Internet connection failure'});
 
   @override
-  List<Object?> get props => <Object>[];
+  List<Object?> get props => <Object>[message];
 }

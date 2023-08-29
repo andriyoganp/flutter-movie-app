@@ -28,9 +28,13 @@ class Movie {
   final String title;
 
   String get durationFormat {
-    final int hour = runtime ~/ 60;
-    final int minutes = runtime % 60;
-    return '${hour}h ${minutes}m';
+    if (runtime > 0) {
+      final int hour = runtime ~/ 60;
+      final int minutes = runtime % 60;
+      return '${hour}h ${minutes}m';
+    } else {
+      return '';
+    }
   }
 
   String get genresInAString {
